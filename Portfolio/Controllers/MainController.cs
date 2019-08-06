@@ -17,7 +17,7 @@ namespace Portfolio.Controllers
     [ApiController]
     public class MainController : ControllerBase
     {
-        private ProjectsContext db; //контекст
+        private readonly ProjectsContext db; //контекст
         /// <summary>
         /// Конструктор
         /// </summary>
@@ -40,19 +40,6 @@ namespace Portfolio.Controllers
                 });
             }
             return Result;
-        }
-        [HttpPost]
-        public async Task<IActionResult> AddProject([FromBody] Project model)
-        {
-            /*if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }*/
-            return null;
-            //db.Users.Add(user);
-            //await db.SaveChangesAsync();
-
-            //return CreatedAtAction("GetUser", new { id = user.ID }, user);
         }
     }
 }

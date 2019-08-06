@@ -4,7 +4,6 @@ export class Project extends Component {
     constructor(props) {
         super(props);
         this.state = { data: props.projects };
-        this.onClick = this.onClick.bind(this);
     }
     onClick(e) {
         this.props.onRemove(this.state.data);
@@ -17,7 +16,6 @@ export class Project extends Component {
             <p><b>{this.state.data.project.dateStart}</b></p>
             <p><b>{this.state.data.project.dateEnd}</b></p>
             <p><Photos projectphotos={this.state.data.projectPhotos} /></p>
-            <p><button onClick={this.onClick}>Удалить</button></p>
         </div>;
     }
 }
@@ -40,59 +38,11 @@ export class Photos extends Component {
     }
 }
 
-/*class ProjectForm extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = { name: "", price: 0 };
-
-        this.onSubmit = this.onSubmit.bind(this);
-        this.onHeaderChange = this.onHeaderChange.bind(this);
-        this.onBodyChange = this.onBodyChange.bind(this);
-    }
-    onHeaderChange(e) {
-        this.setState({ header: e.target.value });
-    }
-    onBodyChange(e) {
-        this.setState({ body: e.target.value });
-    }
-    onSubmit(e) {
-        e.preventDefault();
-        var phoneName = this.state.header;
-        var phonePrice = this.state.body;
-        this.props.onPhoneSubmit({ name: phoneName, price: phonePrice });
-    }
-    render() {
-        return (
-            <form onSubmit={this.onSubmit}>
-
-                <p>
-                    <input type="text"
-                        placeholder="Логин"
-                        value={this.state.Login}
-                        onChange={this.onHeaderChange} />
-                </p>
-                <p>
-                    <input type="password"
-                        placeholder="Пароль"
-                        value={this.state.Password}
-                        onChange={this.onBodyChange} />
-                </p>
-
-                <input type="submit" value="Войти" />
-            </form>
-        );
-    }
-}*/
-
-
 export class Home extends React.Component {
 
     constructor(props) {
         super(props);
         this.loadData();
-        /*this.onAddProject = this.onAddProject.bind(this);
-        this.onRemoveProject = this.onRemoveProject.bind(this);*/
     }
     // загрузка данных
     loadData() {
@@ -104,43 +54,7 @@ export class Home extends React.Component {
             });
         var test = "";
     }
-    // добавление объекта
-    /*onAddProject(e) {
-        e.preventDefault();
-        var login = this.state.Login;
-        var pass = this.state.Password;
-        let formData = new FormData();
-        formData.append('Login', login);
-        formData.append('Password', pass);
-        this.state.error = false
-        let response = await fetch("api/Main",
-            {
-                body: formData,
-                method: "post"
-            });
-        if (!response.ok) {
-            this.state.error = true;
-            this.render();
-        }
-        this.setState({ Login: "", Password: "" });
-    }
-    // удаление объекта
-    onRemoveProject(project) {
 
-        if (project) {
-            var url = this.props.apiUrl + "/" + project.id;
-
-            var xhr = new XMLHttpRequest();
-            xhr.open("delete", url, true);
-            xhr.setRequestHeader("Content-Type", "application/json");
-            xhr.onload = function () {
-                if (xhr.status == 200) {
-                    this.loadData();
-                }
-            }.bind(this);
-            xhr.send();
-        }
-    }*/
     renderForecastsTable(projects) {
         return (
             <table className='table'>
@@ -185,20 +99,5 @@ export class Home extends React.Component {
                 {contents}
             </div>
         );
-    }
-    static render12() {
-        //var remove = this.onRemoveProject;
-        return <div>
-            {/*<ProjectForm onProjectSubmit={this.onAddProject} />*/}
-            <h2>Список проектов</h2>
-            <div>
-                {
-                    this.state.projects.map(function (project) {
-
-                        return <Project key={project.id} project={project} /*onRemove={remove}*/ />
-                    })
-                }
-            </div>
-        </div>;
     }
 }
