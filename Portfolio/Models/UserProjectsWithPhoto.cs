@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Portfolio.Models
 {
-    public class ProjectAndPhotos
+    public class UserProjectsWithPhoto
     {
         public Project Project { get; set; }
         public List<ProjectPhotos> ProjectPhotos { get; set; }

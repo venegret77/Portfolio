@@ -6,13 +6,13 @@ export class Login extends Component {
         this.state = { Login: "", Password: "", error: false };
 
         this.onSubmit = this.onSubmit.bind(this);
-        this.onNameChange = this.onNameChange.bind(this);
-        this.onPriceChange = this.onPriceChange.bind(this);
+        this.onLoginChange = this.onLoginChange.bind(this);
+        this.onPasswordChange = this.onPasswordChange.bind(this);
     }
-    onNameChange(e) {
+    onLoginChange(e) {
         this.setState({ Login: e.target.value });
     }
-    onPriceChange(e) {
+    onPasswordChange(e) {
         this.setState({ Password: e.target.value });
     }
     async onSubmit(e) {
@@ -26,16 +26,18 @@ export class Login extends Component {
         formData.append('Login', login);
         formData.append('Password', pass);
         this.state.error = false
-        let response = await fetch("api/Account",
+        let response = await fetch("api/Login",
             {
                 body: formData,
-                method: "post"
+                method: "POST"
             });
-        if (!response.ok)
-        {
+        if (!response.ok) {
             this.state.error = true;
             this.render();
-            //alert("Неверный логин или пароль!");
+        }
+        else
+        {
+            window.location.replace("/");
         }
         this.setState({ Login: "", Password: "" });
     }
@@ -47,13 +49,13 @@ export class Login extends Component {
                     <input type="text"
                         placeholder="Логин"
                         value={this.state.Login}
-                        onChange={this.onNameChange} />
+                        onChange={this.onLoginChange} />
                 </p>
                 <p>
                     <input type="password"
                         placeholder="Пароль"
                         value={this.state.Password}
-                        onChange={this.onPriceChange} />
+                        onChange={this.onPasswordChange} />
                 </p>
 
                 <input type="submit" value="Войти" />

@@ -28,18 +28,28 @@ namespace Portfolio.Controllers
         /// </summary>
         /// <returns>Возвращает все проекты</returns>
         [HttpGet("[action]")]
-        public IEnumerable<ProjectAndPhotos> GetProjects()
+        async public Task<IEnumerable<UserProjectsWithPhoto>> GetProjects()
         {
-            List<ProjectAndPhotos> Result = new List<ProjectAndPhotos>();
-            foreach (var p in db.Projects)
+            List<UserProjectsWithPhoto> Result = new List<UserProjectsWithPhoto>();
+            var _User = await db.Users.FirstOrDefaultAsync(u => u.Login == User.Identity.Name);
+            var _Projects = await db.UserProjects.Where(p => p.IdUser == _User.ID).ToListAsync();
+            foreach (var p in _Projects)
             {
-                Result.Add(new ProjectAndPhotos
+                var proj = await db.Projects.FirstOrDefaultAsync(pr => pr.ID == p.IdProject);
+                Result.Add(new UserProjectsWithPhoto
                 {
-                    Project = p,
-                    ProjectPhotos = db.ProjectPhotos.Where(ph => ph.ProjectID == p.ID).ToList()
+                    Project = proj,
+                    ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == proj.ID).ToListAsync()
                 });
             }
             return Result;
+        }
+        [HttpGet("[action]")]
+        async public Task<User> GetUser()
+        {
+            if (User.Identity.Name != null)
+                return await db.Users.FirstOrDefaultAsync(u => u.Login == User.Identity.Name);
+            return new User();
         }
     }
 }

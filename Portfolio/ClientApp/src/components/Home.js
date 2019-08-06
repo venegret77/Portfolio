@@ -44,20 +44,27 @@ export class Home extends React.Component {
         super(props);
         this.loadData();
     }
-    // загрузка данных
-    loadData() {
-        this.state = { projects: [], loading: true };
+    // Р—Р°РіСЂСѓР·РєР°
+    async loadData() {
+        this.state = { projects: [], user: Object };
+        this.state.user = "unkown user";
+        await fetch('api/Main/GetUser')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ user: data });
+            });
+        if (this.state.user.login == null) window.location.replace("/login");
         fetch('api/Main/GetProjects')
             .then(response => response.json())
             .then(data => {
-                this.setState({ projects: data, loading: false  });
+                this.setState({ projects: data });
             });
-        var test = "";
     }
 
-    rendeProjectsTable(projects) {
+    rendeProjectsTable(projects, user) {
         return <div>
-            <h1>Список проектов:</h1>
+            <h1>РџСЂРѕРµРєС‚С‹ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ {user.name}</h1>
+            <h1>РЎРїРёСЃРѕРє РїСЂРѕРµРєС‚РѕРІ:</h1>
             {projects.map(projects =>
                 <Project projects={projects} />
             )}
@@ -67,7 +74,7 @@ export class Home extends React.Component {
     render() {
         return (
             <div>
-                {this.rendeProjectsTable(this.state.projects)}
+                {this.rendeProjectsTable(this.state.projects, this.state.user)}
             </div>
         );
     }
