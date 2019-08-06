@@ -55,33 +55,9 @@ export class Home extends React.Component {
         var test = "";
     }
 
-    renderForecastsTable(projects) {
-        return (
-            <table className='table'>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Заголовок</th>
-                        <th>Дальше</th>
-                        <th>ЕЩЕ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {projects.map(project =>
-                        <tr key={project.project.id}>
-                            <td>{project.project.id}</td>
-                            <td>{project.project.header}</td>
-                            <td>{project.project.body}</td>
-                            <td>{project.project.stack}</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-        );
-    }
-
     rendeProjectsTable(projects) {
         return <div>
+            <h1>Список проектов:</h1>
             {projects.map(projects =>
                 <Project projects={projects} />
             )}
@@ -89,14 +65,9 @@ export class Home extends React.Component {
     }
 
     render() {
-        let contents = this.state.loading
-            ? <p><em>Loading...</em></p>
-            : this.rendeProjectsTable(this.state.projects);
-
         return (
             <div>
-                <h1>Список проектов:</h1>
-                {contents}
+                {this.rendeProjectsTable(this.state.projects)}
             </div>
         );
     }
