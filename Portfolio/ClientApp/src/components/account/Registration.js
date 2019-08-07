@@ -1,19 +1,23 @@
-﻿import React, { Component } from 'react';
+﻿import React, { Component } from 'react'
 
 export class Registration extends Component {
-
     constructor(props) {
         super(props);
-        this.state = { Login: "", Password: "" };
-
+        this.state = { Login: "", Password: "", error: false, isLoginUncorrect : false };
         this.onSubmit = this.onSubmit.bind(this);
-        this.onNameChange = this.onNameChange.bind(this);
-        this.onPriceChange = this.onPriceChange.bind(this);
+        this.onLoginChange = this.onLoginChange.bind(this);
+        this.onPasswordChange = this.onPasswordChange.bind(this);
     }
-    onNameChange(e) {
-        this.setState({ Login: e.target.value });
+    onLoginChange(e) {
+        const login = e.target.value
+        this.setState({ Login: login });
+        fetch("api/Registration/CheckLogin?login=" + login)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ isLoginUncorrect: data });
+            });
     }
-    onPriceChange(e) {
+    onPasswordChange(e) {
         this.setState({ Password: e.target.value });
     }
     async onSubmit(e) {
@@ -26,34 +30,54 @@ export class Registration extends Component {
         let formData = new FormData();
         formData.append('Login', login);
         formData.append('Password', pass);
-
-        let response = await fetch("api/Account",
+        this.state.error = false
+        let response = await fetch("api/Registration/CheckLogin",
             {
                 body: formData,
-                method: "post"
+                method: "GET"
             });
         if (!response.ok) {
-            alert("Неверный логин или пароль!");
+            this.state.error = true;
+            this.render();
+        }
+        else {
+            window.location.replace("/");
         }
         this.setState({ Login: "", Password: "" });
     }
     render() {
         return (
             <form onSubmit={this.onSubmit}>
+
                 <p>
                     <input type="text"
                         placeholder="Логин"
                         value={this.state.Login}
-                        onChange={this.onNameChange} />
+                        onChange={this.onLoginChange} />
                 </p>
+                {
+                    this.state.isLoginUncorrect &&
+                    <p>
+                        <h1>Пользователь с таким именем пользователя уже существует!</h1>
+                    </p>
+                }
                 <p>
                     <input type="password"
                         placeholder="Пароль"
                         value={this.state.Password}
-                        onChange={this.onPriceChange} />
+                        onChange={this.onPasswordChange} />
                 </p>
-                <input type="submit" value="Зарегистрироваться" />
+
+                <input type="submit" value="Войти" />
+
+                {
+                    this.state.error &&
+                    <p>
+                        <h1>Неверный логин или пароль!</h1>
+                    </p>
+                }
             </form>
         );
+
     }
 }
