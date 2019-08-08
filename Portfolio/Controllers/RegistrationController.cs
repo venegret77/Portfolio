@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +16,7 @@ namespace Portfolio.Controllers
     [ApiController]
     public class RegistrationController : ControllerBase
     {
-        private readonly ProjectsContext db;
+        private ProjectsContext db;
 
         public RegistrationController(ProjectsContext context)
         {
@@ -29,6 +32,38 @@ namespace Portfolio.Controllers
                 return true;
             else
                 return false;
+        }
+
+        // POST: api/Registration
+        [HttpPost]
+        public async Task<IActionResult> Registration([FromForm] RegistrationModel model)
+        {
+            await db.Users.AddAsync(new Models.User
+            {
+                PhotoRef = "/test/",
+                Name = model.Name,
+                Login = model.Login,
+                Password = model.Password,
+                Description = model.Description,
+                Email = model.Email,
+                Stack = model.Stack
+            });
+            await db.SaveChangesAsync();
+            await Authenticate(model.Login); // аутентификация
+            return Ok();
+        }
+
+        private async Task Authenticate(string userName)
+        {
+            // создаем один claim
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
+            };
+            // создаем объект ClaimsIdentity
+            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+            // установка аутентификационных куки
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
         }
     }
 }

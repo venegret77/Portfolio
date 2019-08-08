@@ -13,12 +13,11 @@ export class NavMenu extends Component {
     async CheckAuth() {
         this.state = { user: Object };
         this.state.user = "unkown user";
-        await fetch('api/Main/GetUser')
+        await fetch('api/Main/GetMyUser')
             .then(response => response.json())
             .then(data => {
                 this.setState({ user: data });
             });
-        //if (this.state.user.login == null) window.location.replace("/login");
     }
 
     render() {

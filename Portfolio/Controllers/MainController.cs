@@ -30,28 +30,82 @@ namespace Portfolio.Controllers
         /// </summary>
         /// <returns>Возвращает все проекты</returns>
         [HttpGet("[action]")]
-        async public Task<IEnumerable<UserProjectsWithPhoto>> GetProjects()
+        async public Task<IEnumerable<UserProjectsWithPhoto>> GetProjects(string uid)
         {
-            List<UserProjectsWithPhoto> Result = new List<UserProjectsWithPhoto>();
-            var _User = await db.Users.FirstOrDefaultAsync(u => u.Login == User.Identity.Name);
-            var _Projects = await db.UserProjects.Where(p => p.IdUser == _User.ID).ToListAsync();
-            foreach (var p in _Projects)
+            try
             {
-                var proj = await db.Projects.FirstOrDefaultAsync(pr => pr.ID == p.IdProject);
-                Result.Add(new UserProjectsWithPhoto
+                List<UserProjectsWithPhoto> Result = new List<UserProjectsWithPhoto>();
+                var _Projects = await db.Projects.Where(p => p.UserID == Convert.ToInt32(uid)).ToListAsync();
+                foreach (var p in _Projects)
                 {
-                    Project = proj,
-                    ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == proj.ID).ToListAsync()
-                });
+                    Result.Add(new UserProjectsWithPhoto
+                    {
+                        Project = p,
+                        ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == p.ID).ToListAsync()
+                    });
+                }
+                return Result;
             }
-            return Result;
+            catch
+            {
+                return new List<UserProjectsWithPhoto>();
+            }
         }
         [HttpGet("[action]")]
-        async public Task<User> GetUser()
+        async public Task<IEnumerable<UserProjectsWithPhoto>> GetMyProjects()
+        {
+            try
+            {
+                var user = await db.Users.FirstOrDefaultAsync(u => u.Login == User.Identity.Name);
+                List<UserProjectsWithPhoto> Result = new List<UserProjectsWithPhoto>();
+                var _Projects = await db.Projects.Where(p => p.UserID == user.ID).ToListAsync();
+                foreach (var p in _Projects)
+                {
+                    Result.Add(new UserProjectsWithPhoto
+                    {
+                        Project = p,
+                        ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == p.ID).ToListAsync()
+                    });
+                }
+                return Result;
+            }
+            catch
+            {
+                return new List<UserProjectsWithPhoto>();
+            }
+        }
+        [HttpGet("[action]")]
+        async public Task<User> GetMyUser()
         {
             if (User.Identity.Name != null)
                 return await db.Users.FirstOrDefaultAsync(u => u.Login == User.Identity.Name);
             return new User();
+        }
+        [HttpGet("[action]")]
+        async public Task<User> GetUser(string uid)
+        {
+            try
+            {
+                return await db.Users.FirstOrDefaultAsync(u => u.ID == Convert.ToInt32(uid));
+            }
+            catch
+            {
+                return new Models.User();
+            }
+        }
+        [HttpGet("[action]")]
+        async Task<List<UserProjects>> GetUsersProjects()
+        {
+            List<UserProjects> UsersProjects = new List<UserProjects>();
+            foreach (var u in db.Users)
+            {
+                UsersProjects.Add(new UserProjects
+                {
+                    User = u,
+                    ProjectsCount = await db.Projects.CountAsync(p => p.UserID == u.ID)
+                });
+            }
+            return UsersProjects;
         }
     }
 }

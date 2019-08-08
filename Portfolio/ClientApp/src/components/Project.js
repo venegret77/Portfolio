@@ -1,54 +1,35 @@
 ﻿import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 
 export class Project extends Component {
     displayName = Project.name
 
     constructor(props) {
         super(props);
-        this.state = { forecasts: [], loading: true };
-
-        fetch('api/Main/GetUsers')
+        this.state = { project: Object, edit: false };
+        let search = new URLSearchParams(this.props.location.search);
+        let id = search.get("id");
+        fetch("api/Project/GetProject?id=" + id)
             .then(response => response.json())
             .then(data => {
-                this.setState({ forecasts: data, loading: false });
+                this.setState({ project: data });
+            });
+        fetch("api/Project/CheckEdit?id=" + id)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ edit: data });
             });
     }
 
-    static renderForecastsTable(forecasts) {
-        return (
-            <table className='table'>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>ФИО</th>
-                        <th>Логин</th>
-                        <th>Пароль</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {forecasts.map(forecast =>
-                        <tr key={forecast.id}>
-                            <td>{forecast.id}</td>
-                            <td>{forecast.name}</td>
-                            <td>{forecast.login}</td>
-                            <td>{forecast.password}</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-        );
-    }
-
     render() {
-        let contents = this.state.loading
-            ? <p><em>Loading...</em></p>
-            : Project.renderForecastsTable(this.state.forecasts);
-
         return (
             <div>
-                <h1>Weather forecast</h1>
-                <p>This component demonstrates fetching data from the server.</p>
-                {contents}
+                {
+                    this.state.edit &&
+                    <p>
+                        <h1>Можно редактировать!</h1>
+                    </p>
+                }
             </div>
         );
     }

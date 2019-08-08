@@ -20,6 +20,6 @@ namespace Portfolio.Models
         public string Password { get; set; } 
         public string Email { get; set; }
         [Required]
-        public bool isAdmin { get; set; } 
+        public string PhotoRef { get; set; } 
     }
 }
