@@ -1,4 +1,5 @@
 ﻿import React, { Component } from 'react'
+import './Registration.css';
 
 export class Registration extends Component {
     constructor(props) {
@@ -13,6 +14,8 @@ export class Registration extends Component {
             Description: "",
             Stack: "",
             Name: "",
+            file: '',
+            imagePreviewUrl: '',
             error: false
         };
         this.onSubmit = this.onSubmit.bind(this);
@@ -24,6 +27,23 @@ export class Registration extends Component {
         this.onStackChange = this.onStackChange.bind(this);
         this.onNameChange = this.onNameChange.bind(this);
     }
+
+    _handleImageChange(e) {
+        e.preventDefault();
+
+        let reader = new FileReader();
+        let file = e.target.files[0];
+
+        reader.onloadend = () => {
+            this.setState({
+                file: file,
+                imagePreviewUrl: reader.result
+            });
+        }
+
+        reader.readAsDataURL(file)
+    }
+
     onLoginChange(e) {
         const login = e.target.value
         this.setState({ Login: login });
@@ -78,6 +98,7 @@ export class Registration extends Component {
         var description = this.state.Description;
         var stack = this.state.Stack;
         var name = this.state.Name;
+        var file = this.state.file;
         let formData = new FormData();
         formData.append('Login', login);
         formData.append('Password', pass);
@@ -85,11 +106,13 @@ export class Registration extends Component {
         formData.append('Description', description);
         formData.append('Stack', stack);
         formData.append('Name', name);
+        formData.append('Photo', file, 'test.jpg');
         this.state.error = false;
         let response = await fetch("api/Registration",
             {
                 body: formData,
-                method: "POST"
+                method: "POST",
+                credentials: 'include'
             });
         if (!response.ok) {
             this.state.error = true;
@@ -100,6 +123,13 @@ export class Registration extends Component {
         }
     }
     render() {
+        let { imagePreviewUrl } = this.state;
+        let $imagePreview = null;
+        if (imagePreviewUrl) {
+            $imagePreview = (<img src={imagePreviewUrl} />);
+        } else {
+            $imagePreview = (<div className="previewText">Пожалуйста загрузите изображение</div>);
+        }
         return (
             <form onSubmit={this.onSubmit}>
                 <p>
@@ -160,6 +190,18 @@ export class Registration extends Component {
                         value={this.state.Stack}
                         onChange={this.onStackChange} />
                 </p>
+                <p>
+                    <div className="previewComponent">
+                        <form onSubmit={(e) => this._handleSubmit(e)}>
+                            <input className="fileInput"
+                                type="file"
+                                onChange={(e) => this._handleImageChange(e)} />
+                        </form>
+                        <div className="imgPreview">
+                            {$imagePreview}
+                        </div>
+                    </div>
+                </p>    
                 <p>
                     <input id="regbtn" type="submit" value="Регистрация" />
                 </p>

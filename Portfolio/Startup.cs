@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Portfolio.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.IO;
+using Microsoft.Extensions.FileProviders;
 
 namespace Portfolio
 {
@@ -57,7 +59,12 @@ namespace Portfolio
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                ServeUnknownFileTypes = true,
+                DefaultContentType = "image/png"
+            });
+            app.UseFileServer();
             app.UseSpaStaticFiles();
             app.UseAuthentication();
             app.UseMvc(routes =>

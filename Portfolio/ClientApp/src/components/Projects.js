@@ -1,19 +1,20 @@
 ﻿import React, { Component } from 'react';
-
-
-import { Project } from './Project';
 import { Link } from 'react-router-dom';
 
 export class MyProject extends Component {
     constructor(props) {
         super(props);
-        this.state = { data: props.projects };
+        this.state = { data: props.projects, isLinked: props.isLinked };
     }
     render() {
         return <div>
-            <li key={this.state.data.project.id}>
-                <Link to={`/project/?id=${this.state.data.project.id}`}>GotoPage!</Link>
-            </li>
+            {
+                this.state.isLinked &&
+                <li key={this.state.data.project.id}>
+                    <Link to={`/project/?id=${this.state.data.project.id}`}>{this.state.data.project.header}</Link>
+                </li>
+            }
+            
             <p><b>{this.state.data.project.id}</b></p>
             <p><b>{this.state.data.project.header}</b></p>
             <p><b>{this.state.data.project.body}</b></p>
@@ -85,8 +86,8 @@ export class Projects extends React.Component {
             <h1>Проекты пользователя {user.name}</h1>
             <h1>Список проектов:</h1>
             <ul>
-            {projects.map(projects =>
-                <MyProject projects={projects} />
+                {projects.map(projects =>
+                    <MyProject projects={projects} isLinked={true} />
                 )}
             </ul>
         </div>

@@ -29,7 +29,8 @@ export class Login extends Component {
         let response = await fetch("api/Login",
             {
                 body: formData,
-                method: "POST"
+                method: "POST",
+                credentials: 'include'
             });
         if (!response.ok) {
             this.state.error = true;
@@ -44,7 +45,6 @@ export class Login extends Component {
     render() {
         return (
             <form onSubmit={this.onSubmit}>
-                
                 <p>
                     <input type="text"
                         placeholder="Логин"
@@ -58,8 +58,7 @@ export class Login extends Component {
                         onChange={this.onPasswordChange} />
                 </p>
 
-                <input type="submit" value="Войти" />
-
+                <button type="submit">Войти</button>
                 {
                     this.state.error &&
                     <p>
