@@ -1,5 +1,6 @@
 ﻿import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import 'typeface-roboto';
 
 export class Project extends Component {
     displayName = Project.name

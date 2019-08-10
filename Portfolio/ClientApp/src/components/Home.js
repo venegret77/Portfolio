@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Button } from '@material-ui/core';
 
 export class Home extends React.Component {
 
@@ -8,6 +9,9 @@ export class Home extends React.Component {
     render() {
         return (
             <div>
+                <Button to="/login" variant="contained" color="primary">
+                    Hello World
+                </Button>
                 <h1>Добро пожаловать!</h1>
             </div>
         )

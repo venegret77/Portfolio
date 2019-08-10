@@ -1,22 +1,44 @@
 import React, { Component } from 'react';
-import { Col, Grid, Row } from 'react-bootstrap';
-import { NavMenu } from './NavMenu';
+import { makeStyles } from '@material-ui/core/styles';
+import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
+import NavMenu from './NavMenu';
+import { Main } from './Main';
 
-export class Layout extends Component {
-  displayName = Layout.name
+const useStyles = makeStyles(theme => ({
+    root: {
+        flexGrow: 1,
+        justify: "center"
+    },
+    paper: {
+        padding: theme.spacing(2),
+        textAlign: 'center',
+        color: theme.palette.text.secondary,
+    },
+}));
 
-  render() {
+export default function CenteredGrid() {
+    const classes = useStyles();
+
     return (
-      <Grid fluid>
-        <Row>
-          <Col sm={3}>
-            <NavMenu />
-          </Col>
-          <Col sm={9}>
-            {this.props.children}
-          </Col>
-        </Row>
-      </Grid>
+        <div className={classes.root}>
+            <Grid justify="center" container spacing={3}>
+                <Grid  item xs={11} >
+                    <NavMenu />
+                </Grid>
+                <Grid item xs={11} >
+                    <Main />
+                </Grid>
+            </Grid>
+        </div>
     );
-  }
+}
+export class Layout extends Component {
+    displayName = Layout.name
+
+    render() {
+        return (
+            <CenteredGrid />
+        );
+    }
 }

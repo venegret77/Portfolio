@@ -33,9 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ClientApp\public\Files\" />
     <Folder Include="wwwroot\files\" />
-    <Folder Include="wwwroot\css\" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
