@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace Portfolio.Models
 {
+    public class ProjectWithYears
+    {
+        public List<UserProjectsWithPhoto> UserProjectsWithPhotos { get; set; }
+        public int year { get; set; }
+    }
     public class UserProjectsWithPhoto
     {
         public Project Project { get; set; }

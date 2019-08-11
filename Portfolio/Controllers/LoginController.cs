@@ -28,15 +28,22 @@ namespace Portfolio.Controllers
         [HttpPost]
         public async Task<IActionResult> Login([FromForm] LoginModel model)
         {
-            var user = await db.Users.FirstOrDefaultAsync(u => u.Login == model.Login && u.Password == model.Password);
-            if (user == null)
+            try
+            {
+                var user = await db.Users.FirstOrDefaultAsync(u => u.Login == model.Login && u.Password == model.Password);
+                if (user == null)
+                {
+                    return BadRequest();
+                }
+                else
+                {
+                    await Authenticate(model.Login); // аутентификация
+                    return Ok();
+                }
+            }
+            catch
             {
                 return BadRequest();
-            }
-            else
-            {
-                await Authenticate(model.Login); // аутентификация
-                return Ok();
             }
         }
 

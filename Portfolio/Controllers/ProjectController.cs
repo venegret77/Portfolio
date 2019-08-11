@@ -21,18 +21,35 @@ namespace Portfolio.Controllers
         }
 
         [HttpGet("[action]")]
-        public Project GetProject(string id)
+        async public Task<UserProjectsWithPhoto> GetProject(string id)
         {
-            return db.Projects.FirstOrDefault(p => p.ID == Convert.ToInt32(id));
+            try
+            {
+                UserProjectsWithPhoto Result = new UserProjectsWithPhoto();
+                Result.Project = await db.Projects.FirstOrDefaultAsync(p => p.ID == Convert.ToInt32(id));
+                Result.ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == Result.Project.ID).ToListAsync();
+                return Result;
+            }
+            catch
+            {
+                return new UserProjectsWithPhoto();
+            }
         }
 
         [HttpGet("[action]")]
         public bool CheckEdit(string id)
         {
-            if (User.Identity.Name == db.Users.FirstOrDefault(u => u.ID == db.Projects.FirstOrDefault(p => p.ID == Convert.ToInt32(id)).UserID).Login)
-                return true;
-            else
+            try
+            {
+                if (User.Identity.Name == db.Users.FirstOrDefault(u => u.ID == db.Projects.FirstOrDefault(p => p.ID == Convert.ToInt32(id)).UserID).Login)
+                    return true;
+                else
+                    return false;
+            }
+            catch
+            {
                 return false;
+            }
         }
     }
 }

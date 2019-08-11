@@ -30,14 +30,83 @@ namespace Portfolio.Controllers
         /// </summary>
         /// <returns>Возвращает все проекты</returns>
         [HttpGet("[action]")]
-        async public Task<IEnumerable<UserProjectsWithPhoto>> GetProjects(string uid)
+        async public Task<IEnumerable<ProjectWithYears>> GetProjects(string uid)
         {
             try
             {
+                List<ProjectWithYears> projects = new List<ProjectWithYears>();
                 List<UserProjectsWithPhoto> Result = new List<UserProjectsWithPhoto>();
                 var _Projects = await db.Projects.Where(p => p.UserID == Convert.ToInt32(uid)).ToListAsync();
                 foreach (var p in _Projects)
                 {
+                    if (projects.Exists(_p => _p.year == p.DateEnd.Year))
+                    {
+                        projects.First(pr => pr.year == p.DateEnd.Year).UserProjectsWithPhotos.Add(new UserProjectsWithPhoto
+                        {
+                            Project = p,
+                            ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == p.ID).ToListAsync()
+                        });
+                    }
+                    else
+                    {
+                        projects.Add(new ProjectWithYears
+                        {
+                            year = p.DateEnd.Year,
+                            UserProjectsWithPhotos = new List<UserProjectsWithPhoto>() { new UserProjectsWithPhoto
+                            {
+                                Project = p,
+                                ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == p.ID).ToListAsync()
+                            }
+                            }
+                        });
+                    }
+                    /*
+                    Result.Add(new UserProjectsWithPhoto
+                    {
+                        Project = p,
+                        ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == p.ID).ToListAsync()
+                    });*/
+                }
+                return projects;
+            }
+            catch
+            {
+                return new List<ProjectWithYears>();
+            }
+        }
+        /*
+        [HttpGet("[action]")]
+        async public Task<IEnumerable<UserProjectsWithPhoto>> GetProjects(string uid)
+        {
+            try
+            {
+                List<ProjectWithYears> projects = new List<ProjectWithYears>();
+                List<UserProjectsWithPhoto> Result = new List<UserProjectsWithPhoto>();
+                var _Projects = await db.Projects.Where(p => p.UserID == Convert.ToInt32(uid)).ToListAsync();
+                foreach (var p in _Projects)
+                {
+                    if (projects.Exists(_p => _p.year == p.DateEnd.Year))
+                    {
+                        projects.First(pr => pr.year == p.DateEnd.Year).UserProjectsWithPhotos.Add(new UserProjectsWithPhoto
+                        {
+                            Project = p,
+                            ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == p.ID).ToListAsync()
+                        });
+                    }
+                    else
+                    {
+                        projects.Add(new ProjectWithYears
+                        {
+                            year = p.DateEnd.Year,
+                            UserProjectsWithPhotos = new List<UserProjectsWithPhoto>() { new UserProjectsWithPhoto
+                            {
+                                Project = p,
+                                ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == p.ID).ToListAsync()
+                            }
+                            }
+                        });
+                    }
+                    
                     Result.Add(new UserProjectsWithPhoto
                     {
                         Project = p,
@@ -50,7 +119,7 @@ namespace Portfolio.Controllers
             {
                 return new List<UserProjectsWithPhoto>();
             }
-        }
+        }*/
         [HttpGet("[action]")]
         async public Task<IEnumerable<UserProjectsWithPhoto>> GetMyProjects()
         {
@@ -94,7 +163,7 @@ namespace Portfolio.Controllers
             }
         }
         [HttpGet("[action]")]
-        async Task<List<UserProjects>> GetUsersProjects()
+        async public Task<IEnumerable<UserProjects>> GetUsersProjects()
         {
             List<UserProjects> UsersProjects = new List<UserProjects>();
             foreach (var u in db.Users)

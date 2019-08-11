@@ -32,35 +32,56 @@ namespace Portfolio.Controllers
         [HttpGet("[action]")]
         public bool CheckLogin(string login)
         {
-            var user = db.Users.Where(u => u.Login == login).ToList();
-            if (user.Count == 1)
-                return true;
-            else
+            try
+            {
+                var user = db.Users.Where(u => u.Login == login).ToList();
+                if (user.Count == 1)
+                    return true;
+                else
+                    return false;
+            }
+            catch
+            {
                 return false;
+            }
         }
 
         // POST: api/Registration
         [HttpPost]
         public async Task<IActionResult> Registration([FromForm] RegistrationModel model)
         {
-            var filePath = "/files/" + model.Photo.FileName;
-            using (var stream = new FileStream(_appEnvironment.WebRootPath + filePath, FileMode.Create))
+            try
             {
-                await model.Photo.CopyToAsync(stream);
+                var filePath = "/files/" + model.Photo.FileName;
+                var isExists = System.IO.File.Exists(_appEnvironment.WebRootPath + filePath);
+                Random rnd = new Random();
+                while (isExists == true)
+                {
+                    filePath = "/files/" + rnd.Next(100000, 999999).ToString() + model.Photo.FileName;
+                    isExists = System.IO.File.Exists(_appEnvironment.WebRootPath + filePath);
+                }
+                using (var stream = new FileStream(_appEnvironment.WebRootPath + filePath, FileMode.Create))
+                {
+                    await model.Photo.CopyToAsync(stream);
+                }
+                await db.Users.AddAsync(new Models.User
+                {
+                    PhotoRef = filePath,
+                    Name = model.Name,
+                    Login = model.Login,
+                    Password = model.Password,
+                    Description = model.Description,
+                    Email = model.Email,
+                    Stack = model.Stack
+                });
+                await db.SaveChangesAsync();
+                await Authenticate(model.Login); // аутентификация
+                return Ok();
             }
-            await db.Users.AddAsync(new Models.User
+            catch
             {
-                PhotoRef = filePath,
-                Name = model.Name,
-                Login = model.Login,
-                Password = model.Password,
-                Description = model.Description,
-                Email = model.Email,
-                Stack = model.Stack
-            });
-            await db.SaveChangesAsync();
-            await Authenticate(model.Login); // аутентификация
-            return Ok();
+                return BadRequest(); ;
+            }
         }
 
         private async Task Authenticate(string userName)

@@ -1,5 +1,11 @@
 ﻿import React, { Component } from 'react'
 import './Registration.css';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import { ErrorSharp } from '@material-ui/icons';
+import Grid from '@material-ui/core/Grid';
+import TextareaAutosize from '@material-ui/core/TextareaAutosize';
+import Avatar from '@material-ui/core/Avatar';
 
 export class Registration extends Component {
     constructor(props) {
@@ -61,6 +67,18 @@ export class Registration extends Component {
     }
     onPasswordChange(e) {
         this.setState({ Password: e.target.value });
+        const cpass = this.state.ConfPassword;
+        const pass = e.target.value
+        this.setState({ Password: pass });
+        this.setState({ ConfPassword: cpass });
+        if (pass == cpass) {
+            document.getElementById('regbtn').disabled = false;
+            this.state.isConfPassUncorrect = false;
+        }
+        else {
+            document.getElementById('regbtn').disabled = true;
+            this.state.isConfPassUncorrect = true;
+        }
     }
     onEmailChange(e) {
         this.setState({ Email: e.target.value });
@@ -83,12 +101,11 @@ export class Registration extends Component {
             document.getElementById('regbtn').disabled = false;
             this.state.isConfPassUncorrect = false;
         }
-        else
-        {
+        else {
             document.getElementById('regbtn').disabled = true;
             this.state.isConfPassUncorrect = true;
         }
-            
+
     }
     async onSubmit(e) {
         e.preventDefault();
@@ -131,87 +148,88 @@ export class Registration extends Component {
             $imagePreview = (<div className="previewText">Пожалуйста загрузите изображение</div>);
         }
         return (
-            <form onSubmit={this.onSubmit}>
-                <p>
-                    <input type="text"
-                        required
-                        placeholder="ФИО"
-                        value={this.state.Name}
-                        onChange={this.onNameChange} />
-                </p>
-                <p>
-                    <input type="text"
-                        required
-                        placeholder="Имя пользователя"
-                        value={this.state.Login}
-                        onChange={this.onLoginChange} />
-                </p>
-                {
-                    this.state.isLoginUncorrect &&
-                    <p>
-                        Пользователь с таким именем пользователя уже существует!
-                    </p>
-                }
-                <p>
-                    <input type="password"
-                        required
-                        placeholder="Пароль"
-                        value={this.state.Password}
-                        onChange={this.onPasswordChange} />
-                </p>
-                <p>
-                    <input type="password"
-                        required
-                        placeholder="Повторите пароль"
-                        value={this.state.ConfPassword}
-                        onChange={this.onPasswordConfimChange} />
-                </p>
-                {
-                    this.state.isConfPassUncorrect &&
-                    <p>
-                        Пароли не совпадают!
-                    </p>
-                }
-                <p>
-                    <input type="text"
-                        placeholder="Почта"
-                        value={this.state.Email}
-                        onChange={this.onEmailChange} />
-                </p>
-                <p>
-                    <textarea type="text"
-                        placeholder="О себе"
-                        value={this.state.Description}
-                        onChange={this.onDescChange} />
-                </p>
-                <p>
-                    <textarea type="text"
-                        placeholder="Навыки"
-                        value={this.state.Stack}
-                        onChange={this.onStackChange} />
-                </p>
-                <p>
-                    <div className="previewComponent">
-                        <form onSubmit={(e) => this._handleSubmit(e)}>
-                            <input className="fileInput"
-                                type="file"
-                                onChange={(e) => this._handleImageChange(e)} />
-                        </form>
-                        <div className="imgPreview">
-                            {$imagePreview}
-                        </div>
-                    </div>
-                </p>    
-                <p>
-                    <input id="regbtn" type="submit" value="Регистрация" />
-                </p>
-                {
-                    this.state.error &&
-                    <p>
-                        <h1>Что-то не так!</h1>
-                    </p>
-                }
-            </form>
+            <Grid justify="center" alignItems="center" container spacing={2}>
+                <form onSubmit={this.onSubmit} noValidate autoComplete="off">
+
+                    <Grid item xs={12} >
+                        <TextField
+                            required
+                            id="standard-with-placeholder"
+                            label="ФИО"
+                            value={this.state.Name}
+                            onChange={this.onNameChange}
+                            margin="normal"
+                            autoComplete="off"
+                        />
+                    </Grid>
+                    <Grid item xs={12} >
+                        <TextField
+                            required
+                            id="standard-with-placeholder"
+                            label="Имя пользователя"
+                            value={this.state.Login}
+                            onChange={this.onLoginChange}
+                            margin="normal"
+                            autoComplete="off"
+                        />
+                    </Grid>
+                    <Grid item xs={12} >
+                        <TextField
+                            required
+                            id="standard-password-input"
+                            label="Пароль"
+                            value={this.state.Password}
+                            type="password"
+                            autoComplete="new-password"
+                            margin="normal"
+                            onChange={this.onPasswordChange}
+                            readonly
+                            onfocus="this.removeAttribute('readonly')"
+                        />
+                    </Grid>
+                    <Grid item xs={12} >
+                        <TextField
+                            required
+                            id="standard-password-input"
+                            label="Повторите пароль"
+                            value={this.state.ConfPassword}
+                            type="password"
+                            autoComplete="new-password"
+                            margin="normal"
+                            onChange={this.onPasswordConfimChange}
+                            readonly
+                            onfocus="this.removeAttribute('readonly')"
+                        />
+                    </Grid>
+                    {
+                        this.state.isConfPassUncorrect &&
+                        <Grid item xs={12} >
+                            <h6>Пароли не совпадают</h6>
+                        </Grid>
+                    }
+                    <Grid container justify="center" alignItems="center" item xs={12}>
+                        <Avatar alt="Remy Sharp" src={this.state.imagePreviewUrl} style={{
+                            margin: 10,
+                            width: 100,
+                            height: 100
+                        }} />
+                            <form onSubmit={(e) => this._handleSubmit(e)}>
+                                    <TextField
+                                    required
+                                        type="file"
+                                        id="standard-with-placeholder"
+                                        label="Выберите файл"
+                                        onChange={(e) => this._handleImageChange(e)}
+                                    />
+                            </form>
+                    </Grid>
+                    <Grid item xs={12} >
+                        <Button type="submit" id="regbtn" variant="contained" color="primary" alignItems="center">
+                            Регистрация
+                        </Button>
+                    </Grid>
+                </form>
+            </Grid>
         );
 
     }
