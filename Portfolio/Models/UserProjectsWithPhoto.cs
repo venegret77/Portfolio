@@ -8,7 +8,7 @@ namespace Portfolio.Models
 {
     public class ProjectWithYears
     {
-        public List<UserProjectsWithPhoto> UserProjectsWithPhotos { get; set; }
+        public List<UserProjectsWithPhoto> projects { get; set; }
         public int year { get; set; }
     }
     public class UserProjectsWithPhoto

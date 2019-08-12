@@ -24,7 +24,6 @@ export class UserCard extends Component {
                     <CardMedia
                         component="img"
                         alt="Contemplative Reptile"
-                        height="140"
                         image={this.state.user.photoRef}
                         title={this.state.user.name}
                     />

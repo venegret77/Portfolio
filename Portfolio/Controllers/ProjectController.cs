@@ -51,5 +51,20 @@ namespace Portfolio.Controllers
                 return false;
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> DeleteProject([FromForm] string id)
+        {
+            try
+            {
+                db.ProjectPhotos.RemoveRange(await db.ProjectPhotos.Where(ph => ph.ProjectID == Convert.ToInt32(id)).ToListAsync());
+                db.Projects.Remove(await db.Projects.FirstAsync(p => p.ID == Convert.ToInt32(id)));
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }

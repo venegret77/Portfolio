@@ -1,5 +1,4 @@
 ﻿import React, { Component } from 'react'
-import './Registration.css';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { ErrorSharp } from '@material-ui/icons';

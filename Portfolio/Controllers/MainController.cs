@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,11 +22,17 @@ namespace Portfolio.Controllers
     public class MainController : ControllerBase
     {
         private readonly ProjectsContext db; //контекст
+        IHostingEnvironment _appEnvironment;
         /// <summary>
         /// Конструктор
         /// </summary>
         /// <param name="context">Контекст данных</param>
-        public MainController(ProjectsContext context) => db = context;
+        public MainController(ProjectsContext context, IHostingEnvironment appEnvironment)
+        {
+            db = context;
+            _appEnvironment = appEnvironment;
+        }
+
         /// <summary>
         /// Запрос на получение данных о проектах
         /// </summary>
@@ -41,7 +49,7 @@ namespace Portfolio.Controllers
                 {
                     if (projects.Exists(_p => _p.year == p.DateEnd.Year))
                     {
-                        projects.First(pr => pr.year == p.DateEnd.Year).UserProjectsWithPhotos.Add(new UserProjectsWithPhoto
+                        projects.First(pr => pr.year == p.DateEnd.Year).projects.Add(new UserProjectsWithPhoto
                         {
                             Project = p,
                             ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == p.ID).ToListAsync()
@@ -52,7 +60,7 @@ namespace Portfolio.Controllers
                         projects.Add(new ProjectWithYears
                         {
                             year = p.DateEnd.Year,
-                            UserProjectsWithPhotos = new List<UserProjectsWithPhoto>() { new UserProjectsWithPhoto
+                            projects = new List<UserProjectsWithPhoto>() { new UserProjectsWithPhoto
                             {
                                 Project = p,
                                 ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == p.ID).ToListAsync()
@@ -60,13 +68,8 @@ namespace Portfolio.Controllers
                             }
                         });
                     }
-                    /*
-                    Result.Add(new UserProjectsWithPhoto
-                    {
-                        Project = p,
-                        ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == p.ID).ToListAsync()
-                    });*/
                 }
+                projects = projects.OrderByDescending(s => s.year).ToList();
                 return projects;
             }
             catch
@@ -74,52 +77,6 @@ namespace Portfolio.Controllers
                 return new List<ProjectWithYears>();
             }
         }
-        /*
-        [HttpGet("[action]")]
-        async public Task<IEnumerable<UserProjectsWithPhoto>> GetProjects(string uid)
-        {
-            try
-            {
-                List<ProjectWithYears> projects = new List<ProjectWithYears>();
-                List<UserProjectsWithPhoto> Result = new List<UserProjectsWithPhoto>();
-                var _Projects = await db.Projects.Where(p => p.UserID == Convert.ToInt32(uid)).ToListAsync();
-                foreach (var p in _Projects)
-                {
-                    if (projects.Exists(_p => _p.year == p.DateEnd.Year))
-                    {
-                        projects.First(pr => pr.year == p.DateEnd.Year).UserProjectsWithPhotos.Add(new UserProjectsWithPhoto
-                        {
-                            Project = p,
-                            ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == p.ID).ToListAsync()
-                        });
-                    }
-                    else
-                    {
-                        projects.Add(new ProjectWithYears
-                        {
-                            year = p.DateEnd.Year,
-                            UserProjectsWithPhotos = new List<UserProjectsWithPhoto>() { new UserProjectsWithPhoto
-                            {
-                                Project = p,
-                                ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == p.ID).ToListAsync()
-                            }
-                            }
-                        });
-                    }
-                    
-                    Result.Add(new UserProjectsWithPhoto
-                    {
-                        Project = p,
-                        ProjectPhotos = await db.ProjectPhotos.Where(ph => ph.ProjectID == p.ID).ToListAsync()
-                    });
-                }
-                return Result;
-            }
-            catch
-            {
-                return new List<UserProjectsWithPhoto>();
-            }
-        }*/
         [HttpGet("[action]")]
         async public Task<IEnumerable<UserProjectsWithPhoto>> GetMyProjects()
         {
@@ -175,6 +132,36 @@ namespace Portfolio.Controllers
                 });
             }
             return UsersProjects;
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddProject([FromForm] ProjectModel model)
+        {
+            try
+            {
+                var project = new Project
+                {
+                    Body = model.Body,
+                    Header = model.Header,
+                    Stack = model.Stack,
+                    DateStart = model.DateStart,
+                    DateEnd = model.DateEnd,
+                    UserID = db.Users.First(u => u.Login == User.Identity.Name).ID
+                };
+                await db.Projects.AddAsync(project);
+                await db.SaveChangesAsync();
+                var pid = project.ID;
+                var ph = await db.ProjectPhotos.Where(p => p.ProjectID == 0).ToListAsync();
+                foreach(var _ph in ph)
+                {
+                    _ph.ProjectID = pid;
+                }
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
     }
 }
